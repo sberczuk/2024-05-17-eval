@@ -2,7 +2,7 @@ from typing import List
 
 from fastapi import FastAPI
 from sqlalchemy import func
-from sqlmodel import SQLModel, Session, select
+from sqlmodel import SQLModel, Session, select, desc
 
 from app.models import ClaimInput, Claim, ClaimLine, ProviderFees
 from app.claims import netFee
@@ -75,7 +75,7 @@ def get_top_ten_npi_by_fees() :
     # if the service had no data, execute the query and update it, either  by local math or re-running the query
     res = []
     with Session(engine) as session:
-        statement = select(Claim.providerNPI, func.sum(Claim.netFee).label('fee')).group_by(Claim.providerNPI).order_by('fee').limit(10)
+        statement = select(Claim.providerNPI, func.sum(Claim.netFee).label('fee')).group_by(Claim.providerNPI).order_by(desc('fee')).limit(10)
 
         result = session.exec(statement)
         for row in result:
