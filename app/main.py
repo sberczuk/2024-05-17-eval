@@ -40,7 +40,7 @@ def create_claim(claim: ClaimInput) :
             session.add(validated_line)
             session.commit()
             session.refresh(validated_line)
-    return {"new id": newId}
+    return {"id": newId, "netFee": fee}
 
 @app.get("/provider_npis")
 async def provider_npis():
