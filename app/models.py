@@ -51,3 +51,8 @@ class Claim(SQLModel, table=True):
     netFee: float | None = None
     providerNPI: str
 
+
+
+class ProviderFees(BaseModel):
+    npi: str
+    netFee: float

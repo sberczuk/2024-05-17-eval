@@ -1,11 +1,13 @@
-from fastapi import FastAPI
-from sqlmodel import SQLModel, Session
+from typing import List
 
-from app.models import ClaimInput, Claim, ClaimLine
+from fastapi import FastAPI
+from sqlalchemy import func
+from sqlmodel import SQLModel, Session, select
+
+from app.models import ClaimInput, Claim, ClaimLine, ProviderFees
 from app.claims import netFee
 
 from app.db import engine
-from app.npi_service import get_top_ten_npi_by_fees
 
 app = FastAPI()
 SQLModel.metadata.create_all(engine)
@@ -17,9 +19,20 @@ async def root():
 
 
 
+# We need a way to deal with duplicate subnmissions.
+# one approach would be to figure out what a Natural Key for a claim line is
+# (Maybe Date, service type, NPI?) and return 201 if it's a duplicate
+# Ideally we can manage the data flow to avoid inconsistencies.
+# We want the claim saving (each line) to be in one transaction, so if this fails (except for the duplicate case)
+# the caller can retry.
+
+# I'm not clear on how this service interacts with Payments...
+
+# To handle multiple instances, we'd want any caching handleed by a shared service (redsis or memcached?)
+
+
 @app.post("/claim")
 def create_claim(claim: ClaimInput) :
-    print("posting a claim")
     fee = netFee(claim.lines)
     provider: str = ""
     if len(claim.lines) > 0:
@@ -42,7 +55,37 @@ def create_claim(claim: ClaimInput) :
             session.refresh(validated_line)
     return {"id": newId, "netFee": fee}
 
+
+
+# We might also want endpoints to support the following:
+# Recent Payment Amounts
+# Payments by NPI
+
 @app.get("/provider_npis")
-async def provider_npis():
-    get_top_ten_npi_by_fees()
-    return {"message": "not implemented"}
+async def provider_npis() :
+    by_fees = get_top_ten_npi_by_fees()
+    return {'result' : by_fees}
+
+
+
+
+def get_top_ten_npi_by_fees() :
+    ## Not completed but this is what I'd do:
+    ## Add a call  to a caching service. The service would also get updated when a new claim comes in
+    # if the service had no data, execute the query and update it, either  by local math or re-running the query
+    res = []
+    with Session(engine) as session:
+        statement = select(Claim.providerNPI, func.sum(Claim.netFee).label('fee')).group_by(Claim.providerNPI).order_by('fee').limit(10)
+
+        result = session.exec(statement)
+        for row in result:
+            print(row)
+            res.append({'npi': row[0], 'fees': row[1]})
+    return {"data": res}
+
+    # What I wanted to do was a select with a group by.. I need to learn the syntax better,,
+    #  with Session(engine) as session:
+    #         statement = select([Claim.providerNPI, func.sum(Claim.netFee)]).group_by(Claim.providerNPI).order_by(func.sum(Claim.netFee).limit(10))
+    #         result = session.exec(statement)
+    #         for row in result:
+    #
