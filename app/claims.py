@@ -2,9 +2,7 @@ from typing import List
 
 from sqlmodel import Session
 
-from models import Claim
-from models import ClaimLine
-import uuid
+from .models import Claim, ClaimLine
 
 def makeClaim(claimLines:List[ClaimLine], engine) -> Claim:
     fee = netFee(claimLines)
@@ -22,3 +20,6 @@ def netFee(claimLines: List[ClaimLine]):
     for l in claimLines:
         fee = fee + l.providerFees + l.coInsurance + l.memberCoPay-l.allowedFees
     return fee
+
+
+

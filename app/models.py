@@ -42,10 +42,12 @@ class ClaimLine(SQLModel, table=True):
 class ClaimInput(BaseModel):
     id: int | None = None
     netFee: float | None = None
+    providerNPI: str | None = None
     lines: List[ClaimLine]
 
 
 class Claim(SQLModel, table=True):
     id: int | None  = Field(default=None, primary_key=True)
     netFee: float | None = None
+    providerNPI: str
 

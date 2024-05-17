@@ -1,11 +1,13 @@
 
 
-dockerfile:
-    docker build -t claim_process  .
-
-run-docker: dockerfile
-    docker run -d --name claim_process_container  -p 80:80 claim_process
+dockerfile:requirements
+	docker build -t claims_processor .
 
 
-requirements: requirements.txt
-    pip3 freeze > requirements.txt
+run-docker:
+	docker run -d --name claim_process_container  -p 80:80 claims_processor
+
+
+requirements:
+	pip3 freeze > requirements.txt
+

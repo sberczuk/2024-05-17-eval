@@ -1,29 +1,32 @@
 from fastapi import FastAPI
 from sqlmodel import SQLModel, Session
 
-from models import Claim, ClaimInput, ClaimLine
-from claims import makeClaim, netFee
-from db import engine
+from app.models import ClaimInput, Claim, ClaimLine
+from app.claims import netFee
+
+from app.db import engine
+from app.npi_service import get_top_ten_npi_by_fees
+
 app = FastAPI()
 SQLModel.metadata.create_all(engine)
 
 @app.get("/")
 async def root():
-    return {"message": "Hello World"}
+    return {"message": "Hello Claims Processor User"}
 
-
-@app.get("/hello/{name}")
-async def say_hello(name: str):
-    return {"message": f"Hello {name}"}
 
 
 
 @app.post("/claim")
 def create_claim(claim: ClaimInput) :
     print("posting a claim")
-    # claim_with_id = makeClaim(claim.lines, engine)
     fee = netFee(claim.lines)
+    provider: str = ""
+    if len(claim.lines) > 0:
+        provider = claim.lines[0].providerNPI
     claim.netFee = fee
+    if claim.providerNPI is None:
+        claim.providerNPI = provider
     newId = 0
     with Session(engine) as session:
         validated_claim = Claim.model_validate(claim)
@@ -41,4 +44,5 @@ def create_claim(claim: ClaimInput) :
 
 @app.get("/provider_npis")
 async def provider_npis():
+    get_top_ten_npi_by_fees()
     return {"message": "not implemented"}
