@@ -1,13 +1,20 @@
 from typing import List
 
-from app_models import Claim
-from app_models import ClaimLine
+from sqlmodel import Session
+
+from models import Claim
+from models import ClaimLine
 import uuid
 
-def makeClaim(claimLines:List[ClaimLine]) -> Claim:
-    new_uuid = str(uuid.uuid4())
+def makeClaim(claimLines:List[ClaimLine], engine) -> Claim:
     fee = netFee(claimLines)
-    return Claim(id=new_uuid, lines=claimLines, netFee=fee)
+    c= Claim( netFee=fee)
+    with Session(engine) as session:
+        validated_claim = Claim.model_validate(c)
+        session.add(validated_claim)
+        session.commit()
+        session.refresh(validated_claim)
+        return validated_claim
 
 
 def netFee(claimLines: List[ClaimLine]):
