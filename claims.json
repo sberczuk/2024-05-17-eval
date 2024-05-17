@@ -1,0 +1,52 @@
+{
+  "lines": [
+    {
+      "date": "3/28/18 0:00",
+      "submittedProcedure": "D0180",
+      "quadrant": "",
+      "planId": "GRP-1000",
+      "subscriberId": "3730189502",
+      "providerNPI": "1497775530",
+      "providerFees": 100.0,
+      "allowedFees": 100.0,
+      "coInsurance": 0.0,
+      "memberCoPay": 0.0
+    },
+    {
+      "date": "3/28/18 0:00",
+      "submittedProcedure": "D0210",
+      "quadrant": "",
+      "planId": "GRP-1000",
+      "subscriberId": "3730189502",
+      "providerNPI": "1497775530",
+      "providerFees": 108.0,
+      "allowedFees": 108.0,
+      "coInsurance": 0.0,
+      "memberCoPay": 0.0
+    },
+    {
+      "date": "3/28/18 0:00",
+      "submittedProcedure": "D4346",
+      "quadrant": "",
+      "planId": "GRP-1000",
+      "subscriberId": "3730189502",
+      "providerNPI": "1497775530",
+      "providerFees": 130.0,
+      "allowedFees": 65.0,
+      "coInsurance": 16.25,
+      "memberCoPay": 0.0
+    },
+    {
+      "date": "3/28/18 0:00",
+      "submittedProcedure": "D4211",
+      "quadrant": "UR",
+      "planId": "GRP-1000",
+      "subscriberId": "3730189502",
+      "providerNPI": "1497775530",
+      "providerFees": 178.0,
+      "allowedFees": 178.0,
+      "coInsurance": 35.6,
+      "memberCoPay": 0.0
+    }
+  ]
+}
