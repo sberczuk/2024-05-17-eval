@@ -43,7 +43,7 @@ class ClaimInput(BaseModel):
     id: int | None = None
     netFee: float | None = None
     providerNPI: str | None = None
-    lines: List[ClaimLine]
+    lines: List[ClaimLine] = []
 
 
 class Claim(SQLModel, table=True):
