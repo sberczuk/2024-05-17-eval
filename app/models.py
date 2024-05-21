@@ -17,8 +17,8 @@ class ClaimLine(SQLModel, table=True):
     submittedProcedure: str = Field(default=None, description="Procedure id")
     quadrant: str | None
     planId: str
-    subscriberId: str=Field(default=None, description='subscriber id"')
-    providerNPI: str =Field(min_length=10, max_length=10, default=None, description='NPI"')
+    subscriberId: str = Field(default=None, description='subscriber id"')
+    providerNPI: str = Field(min_length=10, max_length=10, default=None, description='NPI"')
     providerFees: float
     allowedFees: float
     coInsurance: float
@@ -43,14 +43,13 @@ class ClaimInput(BaseModel):
     id: int | None = None
     netFee: float | None = None
     providerNPI: str | None = None
-    lines: List[ClaimLine] = []
+    lines: List[ClaimLine] = Field(description="Line items for a claim", min_items=2)
 
 
 class Claim(SQLModel, table=True):
-    id: int | None  = Field(default=None, primary_key=True)
+    id: int | None = Field(default=None, primary_key=True)
     netFee: float | None = None
     providerNPI: str
-
 
 
 class ProviderFees(BaseModel):
