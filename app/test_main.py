@@ -87,20 +87,12 @@ class Test(TestCase):
         response = client.post("/claim", json=invalidProcedure)
         print(response.status_code)
         assert response.status_code == 422
-        json = response.json()
-        id = json.get("id")
-        assert id != None
-        assert id != ""
-        assert json.get("netFee") is not None
+
 
     def test_create_claim_invalid_npi(self):
         response = client.post("/claim", json=invalidNPI)
         print(response.status_code)
         assert response.status_code == 422
-        json = response.json()
-        id = json.get("id")
-        assert id != None
-        assert id != ""
-        assert json.get("netFee") is not None
+
     # def test_provider_npis(self):
     #     self.fail()
