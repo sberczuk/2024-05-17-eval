@@ -35,10 +35,40 @@ claim1 = {
     ]
 }
 
-claim2 = {
+invalidProcedure = {
+    "lines": [
+        {
+            "date": "3/28/18 0:00",
+            "submittedProcedure": "W0180",
+            "quadrant": "",
+            "planId": "GRP-1000",
+            "subscriberId": "3730189502",
+            "providerNPI": "1497775530",
+            "providerFees": 100.0,
+            "allowedFees": 99.0,
+            "coInsurance": 0.0,
+            "memberCoPay": 0.0
+        },
 
-    "id": "12345"
+    ]
+}
 
+invalidNPI = {
+    "lines": [
+        {
+            "date": "3/28/18 0:00",
+            "submittedProcedure": "W0180",
+            "quadrant": "",
+            "planId": "GRP-1000",
+            "subscriberId": "3730189502",
+            "providerNPI": "14",
+            "providerFees": 100.0,
+            "allowedFees": 99.0,
+            "coInsurance": 0.0,
+            "memberCoPay": 0.0
+        },
+
+    ]
 }
 
 
@@ -53,5 +83,24 @@ class Test(TestCase):
         assert id != ""
         assert json.get("netFee") is not None
 
-    def test_provider_npis(self):
-        self.fail()
+    def test_create_claim_invalid_provider(self):
+        response = client.post("/claim", json=invalidProcedure)
+        print(response.status_code)
+        assert response.status_code == 300
+        json = response.json()
+        id = json.get("id")
+        assert id != None
+        assert id != ""
+        assert json.get("netFee") is not None
+
+    def test_create_claim_invalid_npi(self):
+        response = client.post("/claim", json=invalidNPI)
+        print(response.status_code)
+        assert response.status_code == 300
+        json = response.json()
+        id = json.get("id")
+        assert id != None
+        assert id != ""
+        assert json.get("netFee") is not None
+    # def test_provider_npis(self):
+    #     self.fail()

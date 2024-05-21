@@ -1,8 +1,10 @@
 from typing import List
 
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
+from fastapi.exceptions import RequestValidationError
 from sqlalchemy import func
 from sqlmodel import SQLModel, Session, select, desc
+from starlette.responses import PlainTextResponse
 
 from app.models import ClaimInput, Claim, ClaimLine, ProviderFees
 from app.claims import netFee
@@ -12,11 +14,12 @@ from app.db import engine
 app = FastAPI()
 SQLModel.metadata.create_all(engine)
 
+
+
+
 @app.get("/")
 async def root():
     return {"message": "Hello Claims Processor User"}
-
-
 
 
 # We need a way to deal with duplicate subnmissions.
@@ -32,7 +35,7 @@ async def root():
 
 
 @app.post("/claim")
-def create_claim(claim: ClaimInput) :
+def create_claim(claim: ClaimInput):
     fee = netFee(claim.lines)
     provider: str = ""
     if len(claim.lines) > 0:
@@ -40,7 +43,6 @@ def create_claim(claim: ClaimInput) :
     claim.netFee = fee
     if claim.providerNPI is None:
         claim.providerNPI = provider
-    newId = 0
     with Session(engine) as session:
         validated_claim = Claim.model_validate(claim)
         session.add(validated_claim)
@@ -56,30 +58,26 @@ def create_claim(claim: ClaimInput) :
     return {"id": newId, "netFee": fee}
 
 
-
 # We might also want endpoints to support the following:
 # Recent Payment Amounts
 # Payments by NPI
 
 @app.get("/provider_npis")
-async def provider_npis() :
+async def provider_npis():
     by_fees = get_top_ten_npi_by_fees()
-    return {'result' : by_fees}
+    return {'result': by_fees}
 
 
-
-
-def get_top_ten_npi_by_fees() :
+def get_top_ten_npi_by_fees():
     ## Not completed but this is what I'd do:
     ## Add a call  to a caching service. The service would also get updated when a new claim comes in
     # if the service had no data, execute the query and update it, either  by local math or re-running the query
     res = []
     with Session(engine) as session:
-        statement = select(Claim.providerNPI, func.sum(Claim.netFee).label('fee')).group_by(Claim.providerNPI).order_by(desc('fee')).limit(10)
+        statement = select(Claim.providerNPI, func.sum(Claim.netFee).label('fee')).group_by(Claim.providerNPI).order_by(
+            desc('fee')).limit(10)
 
         result = session.exec(statement)
         for row in result:
             res.append({'npi': row[0], 'fees': row[1]})
     return {"data": res}
-
-

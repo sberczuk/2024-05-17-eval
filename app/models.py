@@ -14,11 +14,11 @@ class ClaimLine(SQLModel, table=True):
     id: int | None = Field(default=None, primary_key=True)
     claimId: int | None = Field(default=None, foreign_key="claim.id")
     date: str
-    submittedProcedure: str
+    submittedProcedure: str = Field(default=None, description="Procedure id")
     quadrant: str | None
     planId: str
-    subscriberId: str
-    providerNPI: str
+    subscriberId: str=Field(default=None, description='subscriber id"')
+    providerNPI: str =Field(min_length=10, max_length=10, default=None, description='NPI"')
     providerFees: float
     allowedFees: float
     coInsurance: float
@@ -31,12 +31,12 @@ class ClaimLine(SQLModel, table=True):
             raise ValueError('must start with D')
         return v
 
-    @field_validator('providerNPI')
-    @classmethod
-    def provider_npi_len(cls, v: str) -> str:
-        if not len(v) == 10:
-            raise ValueError('NPI must be 10 digits long')
-        return v
+    # @field_validator('providerNPI')
+    # @classmethod
+    # def provider_npi_len(cls, v: str) -> str:
+    #     if not len(v) == 10:
+    #         raise ValueError('NPI must be 10 digits long')
+    #     return v
 
 
 class ClaimInput(BaseModel):
