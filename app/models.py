@@ -41,6 +41,8 @@ class ClaimLine(SQLModel, table=True):
 
 # I'm  not sure why I can't share a model here, but it's probably not a bad thing to separate the
 # HTTP from the persistence layer
+# This doc implies that they can be reused: https://sqlmodel.tiangolo.com/tutorial/fastapi/simple-hero-api/
+# but I don't get the web side validation for a nested model
 class ClaimLineInput(BaseModel):
     id: int | None = Field(default=None, primary_key=True)
     claimId: int | None = Field(default=None, foreign_key="claim.id")
