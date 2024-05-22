@@ -39,11 +39,11 @@ def currency_to_value(currency_string: str) -> float:
 # generate the sample JSON Data File
 if __name__ == '__main__':
     lines = parser("claim_1234.csv")
-    claim:dict = {'lines': lines}
+
 
 
     # write the JSON File
-    dumps = json.dumps(claim)
+    dumps = json.dumps(lines)
     with open("claims.json", "w") as jsonFile:
         jsonFile.write(dumps)
 
