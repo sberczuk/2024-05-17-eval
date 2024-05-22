@@ -6,7 +6,7 @@ from sqlalchemy import func
 from sqlmodel import SQLModel, Session, select, desc
 from starlette.responses import PlainTextResponse
 
-from app.models import ClaimInput, Claim, ClaimLine, ProviderFees
+from app.models import ClaimInput, Claim, ClaimLine, ProviderFees, ClaimLineBase
 from app.claims import netFee
 
 from app.db import engine
@@ -35,21 +35,24 @@ async def root():
 
 
 @app.post("/claim")
-def create_claim(claim: ClaimInput):
-    fee = netFee(claim.lines)
+def create_claim(lines: list[ClaimLineBase]):
+    fee = netFee(lines)
     provider: str = ""
-    if len(claim.lines) > 0:
-        provider = claim.lines[0].providerNPI
-    claim.netFee = fee
-    if claim.providerNPI is None:
-        claim.providerNPI = provider
+    if len(lines) > 0:
+        provider = lines[0].providerNPI
+
+    c = Claim()
+    c.netFee = fee
+
+
+    c.providerNPI = provider
     with Session(engine) as session:
-        validated_claim = Claim.model_validate(claim)
+        validated_claim = Claim.model_validate(c)
         session.add(validated_claim)
         session.commit()
         session.refresh(validated_claim)
         newId = validated_claim.id
-        for l in claim.lines:
+        for l in lines:
             l.claimId = validated_claim.id
             validated_line = ClaimLine.model_validate(l)
             session.add(validated_line)

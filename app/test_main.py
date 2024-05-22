@@ -6,8 +6,7 @@ from app.main import app
 
 client = TestClient(app)
 
-claim1 = {
-    "lines": [
+claim1 =  [
         {
             "date": "3/28/18 0:00",
             "submittedProcedure": "D0180",
@@ -33,10 +32,9 @@ claim1 = {
             "memberCoPay": 0.0
         }
     ]
-}
 
-invalidProcedure = {
-    "lines": [
+
+invalidProcedure =[
         {
             "date": "3/28/18 0:00",
             "submittedProcedure": "W0180",
@@ -51,10 +49,9 @@ invalidProcedure = {
         },
 
     ]
-}
 
-invalidNPI = {
-    "lines": [
+
+invalidNPI = [
         {
             "date": "3/28/18 0:00",
             "submittedProcedure": "W0180",
@@ -69,7 +66,7 @@ invalidNPI = {
         },
 
     ]
-}
+
 
 
 class Test(TestCase):

@@ -10,15 +10,14 @@ from sqlmodel import SQLModel, Field
 
 # Use synthetic keys for claim for now; it's not clear what a Natural Key might be
 # Also I deferred handling the date as a Date since we don't need it. That shouid be fixed
-class ClaimLine(SQLModel, table=True):
-    id: int | None = Field(default=None, primary_key=True)
+class ClaimLineBase(SQLModel, ):
     claimId: int | None = Field(default=None, foreign_key="claim.id")
     date: str
     submittedProcedure: str = Field(default=None, description="Procedure id")
     quadrant: str | None
     planId: str
     subscriberId: str = Field(default=None, description='subscriber id"')
-    providerNPI: str = Field(min_length=10, max_length=10, default=None, description='NPI"')
+    providerNPI: str = Field(min_length=10, max_length=10, default=None, description="NPI")
     providerFees: float
     allowedFees: float
     coInsurance: float
@@ -37,6 +36,9 @@ class ClaimLine(SQLModel, table=True):
     #     if not len(v) == 10:
     #         raise ValueError('NPI must be 10 digits long')
     #     return v
+
+class ClaimLine(ClaimLineBase, table=True):
+    id: int | None = Field(default=None, primary_key=True)
 
 
 # I'm  not sure why I can't share a model here, but it's probably not a bad thing to separate the
@@ -77,7 +79,7 @@ class ClaimInput(BaseModel):
     id: int | None = None
     netFee: float | None = None
     providerNPI: str | None = None
-    lines: List[ClaimLineInput] = Field(description="Line items for a claim", min_items=2)
+    lines: List[ClaimLine] = Field(description="Line items for a claim", min_items=1)
 
 
 class Claim(SQLModel, table=True):
